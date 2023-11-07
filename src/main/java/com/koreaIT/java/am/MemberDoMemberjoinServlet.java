@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 
 import com.koreaIT.java.am.util.DBUtil;
 import com.koreaIT.java.am.util.SecSql;
@@ -16,11 +14,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/article/list") // url매핑
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/member/dojoin")
+public class MemberDoMemberjoinServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		response.setContentType("text/html; charset=UTF-8;");
+		
+		String loginId = request.getParameter("loginId");
+		String loginPw = request.getParameter("loginPw");
+		String userName = request.getParameter("userName");
+		
 		Connection conn = null;
 
 		try {
@@ -28,47 +33,16 @@ public class ArticleListServlet extends HttpServlet {
 			String url = "jdbc:mysql://127.0.0.1:3306/JSP_AM?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
 			conn = DriverManager.getConnection(url, "root", "");
 
-			int page = 1;
-			
-			if (request.getParameter("page") != null) {
-				page = Integer.parseInt(request.getParameter("page"));
-			}
-			
-			int itemInAPage = 10;
-			
 			SecSql sql = new SecSql();
-			sql.append("SELECT COUNT(*) FROM article");
+			sql.append("INSERT INTO member");
+			sql.append("updateDate = NOW(),");
+			sql.append("loginId = ?,", loginId);
+			sql.append("loginPw = ?,", loginPw);
+			sql.append("'name' = ?", userName);
 			
-			int totalCnt = DBUtil.selectRowIntValue(conn, sql);
-			int totalPage = (int) Math.ceil((double) totalCnt / itemInAPage);
-			int limitFrom = (page - 1) * itemInAPage;
+			DBUtil.insert(conn, sql);
 			
-			int pageSize = 5;
-			
-			int from = page - pageSize;
-			if (from < 1) {
-				from = 1;
-			}
-			
-			int end = page + pageSize;
-			if (end > totalPage) {
-				end = totalPage;
-			}
-			
-			sql = new SecSql();
-			sql.append("SELECT * FROM article");
-			sql.append("ORDER BY id DESC");
-			sql.append("LIMIT ?, ?", limitFrom, itemInAPage);
-			
-			List<Map<String, Object>> articleListMap = DBUtil.selectRows(conn, sql);
-			
-			request.setAttribute("from", from);
-			request.setAttribute("end", end);
-			request.setAttribute("page", page);
-			request.setAttribute("totalPage", totalPage);
-			request.setAttribute("articleListMap", articleListMap);
-			
-			request.getRequestDispatcher("/jsp/article/list.jsp").forward(request, response);
+		request.getRequestDispatcher("/jsp/member/memberjoin.jsp").forward(request, response);
 			
 		} catch (ClassNotFoundException e) {
 			System.out.println("드라이버 로딩 실패");
@@ -85,5 +59,5 @@ public class ArticleListServlet extends HttpServlet {
 			}
 		}
 	}
-
-}
+		
+	}
