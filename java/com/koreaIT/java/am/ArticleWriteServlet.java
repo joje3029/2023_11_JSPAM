@@ -7,12 +7,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/article/modify")
-public class ArticleModifyServlet extends HttpServlet {
+@WebServlet("/article/write")
+public class ArticleWriteServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher("/jsp/article/modify.jsp").forward(request, response);
+		request.getRequestDispatcher("/jsp/article/write.jsp").forward(request, response);
+		
+
 	}
 }

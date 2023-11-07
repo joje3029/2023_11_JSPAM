@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
+import com.koreaIT.java.am.config.Config;
 import com.koreaIT.java.am.util.DBUtil;
 import com.koreaIT.java.am.util.SecSql;
 
@@ -14,35 +16,30 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/member/dojoin")
-public class MemberDoMemberjoinServlet extends HttpServlet {
+@WebServlet("/article/detail") // url매핑
+public class ArticleDetailServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		response.setContentType("text/html; charset=UTF-8;");
-		
-		String loginId = request.getParameter("loginId");
-		String loginPw = request.getParameter("loginPw");
-		String userName = request.getParameter("userName");
+		int id = Integer.parseInt(request.getParameter("id"));
 		
 		Connection conn = null;
 
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://127.0.0.1:3306/JSP_AM?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
-			conn = DriverManager.getConnection(url, "root", "");
+			Class.forName(Config.getDBDriverName());
+			String url = Config.getDBUrl();
+			conn = DriverManager.getConnection(url, Config.getDBUser(), Config.getDBPassWd());
 
 			SecSql sql = new SecSql();
-			sql.append("INSERT INTO member");
-			sql.append("updateDate = NOW(),");
-			sql.append("loginId = ?,", loginId);
-			sql.append("loginPw = ?,", loginPw);
-			sql.append("'name' = ?", userName);
+			sql.append("SELECT * FROM article");
+			sql.append("WHERE id = ?", id);
 			
-			DBUtil.insert(conn, sql);
+			Map<String, Object> articleMap = DBUtil.selectRow(conn, sql);
 			
-		request.getRequestDispatcher("/jsp/member/memberjoin.jsp").forward(request, response);
+			request.setAttribute("articleMap", articleMap);
+			
+			request.getRequestDispatcher("/jsp/article/detail.jsp").forward(request, response);
 			
 		} catch (ClassNotFoundException e) {
 			System.out.println("드라이버 로딩 실패");
@@ -59,5 +56,5 @@ public class MemberDoMemberjoinServlet extends HttpServlet {
 			}
 		}
 	}
-		
-	}
+
+}

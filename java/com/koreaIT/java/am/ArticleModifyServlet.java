@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
+import com.koreaIT.java.am.config.Config;
 import com.koreaIT.java.am.util.DBUtil;
 import com.koreaIT.java.am.util.SecSql;
 
@@ -15,8 +16,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/article/detail") // url매핑
-public class ArticleDetailServlet extends HttpServlet {
+@WebServlet("/article/modify") // url매핑
+public class ArticleModifyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -26,9 +27,9 @@ public class ArticleDetailServlet extends HttpServlet {
 		Connection conn = null;
 
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://127.0.0.1:3306/JSP_AM?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
-			conn = DriverManager.getConnection(url, "root", "");
+			Class.forName(Config.getDBDriverName());
+			String url = Config.getDBUrl();
+			conn = DriverManager.getConnection(url, Config.getDBUser(), Config.getDBPassWd());
 
 			SecSql sql = new SecSql();
 			sql.append("SELECT * FROM article");
@@ -38,7 +39,7 @@ public class ArticleDetailServlet extends HttpServlet {
 			
 			request.setAttribute("articleMap", articleMap);
 			
-			request.getRequestDispatcher("/jsp/article/detail.jsp").forward(request, response);
+			request.getRequestDispatcher("/jsp/article/modify.jsp").forward(request, response);
 			
 		} catch (ClassNotFoundException e) {
 			System.out.println("드라이버 로딩 실패");
